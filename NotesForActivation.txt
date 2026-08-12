@@ -1,0 +1,16 @@
+Backend
+
+Docker setup:
+Start: docker compose up -d
+Stop: docker compose stop
+Check status: docker compose ps
+
+python venv setup:
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
+installed languages:
+python
+java
+c++
