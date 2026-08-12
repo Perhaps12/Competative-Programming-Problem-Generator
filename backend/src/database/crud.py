@@ -1,0 +1,59 @@
+"""
+All internal database commands live here. Routes should call these functions
+instead of touching SQLAlchemy sessions/queries directly.
+"""
+
+from typing import List, Optional
+
+from sqlalchemy.orm import Session
+
+from src.database import models
+
+
+def create_problem(
+    db: Session,
+    title: str,
+    difficulty: str,
+    statement: str,
+    solution_code: str,
+    test_cases: List[dict],  # each dict: {"input": str, "output": str}
+) -> models.Problem:
+    db_problem = models.Problem(
+        title=title,
+        difficulty=difficulty,
+        statement=statement,
+        solution_code=solution_code,
+    )
+    db_problem.test_cases = [
+        models.TestCase(input=tc["input"], output=tc["output"]) for tc in test_cases
+    ]
+
+    db.add(db_problem)
+    db.commit()
+    db.refresh(db_problem)
+    return db_problem
+
+
+def get_problem(db: Session, problem_id: int) -> Optional[models.Problem]:
+    return db.query(models.Problem).filter(models.Problem.id == problem_id).first()
+
+
+def list_problems(db: Session) -> List[models.Problem]:
+    return db.query(models.Problem).order_by(models.Problem.created_at.desc()).all()
+
+
+def delete_problem(db: Session, problem_id: int) -> bool:
+    db_problem = get_problem(db, problem_id)
+    if not db_problem:
+        return False
+    db.delete(db_problem)
+    db.commit()
+    return True
+
+
+def get_test_cases_for_problem(db: Session, problem_id: int) -> List[models.TestCase]:
+    return (
+        db.query(models.TestCase)
+        .filter(models.TestCase.problem_id == problem_id)
+        .all()
+    )

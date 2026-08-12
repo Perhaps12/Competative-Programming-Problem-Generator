@@ -10,5 +10,19 @@ services:
       - piston_data:/piston
       - /var/run/docker.sock:/var/run/docker.sock
 
+  postgres:
+    image: postgres:16
+    container_name: problemdata_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: problemdata
+      POSTGRES_PASSWORD: postgres_z7fra9zu
+      POSTGRES_DB: problemdata_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   piston_data:
+  postgres_data:
