@@ -1,13 +1,11 @@
-import os
 from typing import Optional
 
-import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-router = APIRouter()
+from src.services.piston import execute_code, PistonError
 
-PISTON_URL = os.environ.get("PISTON_URL", "http://localhost:2000")
+router = APIRouter()
 
 
 class ExecuteRequest(BaseModel):
@@ -25,32 +23,16 @@ class ExecuteResult(BaseModel):
 
 
 @router.post("/", response_model=ExecuteResult)
-async def execute_code(req: ExecuteRequest):
+async def execute(req: ExecuteRequest):
     """Run submitted code against Piston and return simplified results."""
-    payload = {
-        "language": req.language,
-        "version": req.version,
-        "files": [{"content": req.code}],
-        "stdin": req.stdin or "",
-    }
+    try:
+        result = await execute_code(
+            language=req.language,
+            code=req.code,
+            stdin=req.stdin,
+            version=req.version,
+        )
+    except PistonError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-    async with httpx.AsyncClient() as client:
-        try:
-            resp = await client.post(
-                f"{PISTON_URL}/api/v2/execute", json=payload, timeout=30
-            )
-        except httpx.HTTPError as e:
-            raise HTTPException(status_code=502, detail=f"Could not reach Piston: {e}")
-
-    if resp.status_code >= 400:
-        raise HTTPException(status_code=resp.status_code, detail=resp.text)
-
-    data = resp.json()
-    run = data.get("run", {})
-
-    return ExecuteResult(
-        stdout=run.get("stdout"),
-        stderr=run.get("stderr"),
-        exit_code=run.get("code"),
-        output=run.get("output"),
-    )
+    return ExecuteResult(**result)
