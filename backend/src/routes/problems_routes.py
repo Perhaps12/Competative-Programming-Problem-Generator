@@ -42,8 +42,9 @@ async def create_problem(req: schemas.ProblemCreateRequest, db: Session = Depend
     import time
     t0 = time.time()
 
-    # --- 1. Generate the problem ---
-    problem_data = generate_problem(req.difficulty)
+    # --- 1. Generate the problem (avoiding repeats of existing titles) ---
+    existing_titles = crud.get_all_titles(db)
+    problem_data = generate_problem(req.difficulty, existing_titles=existing_titles)
     print(f"[create_problem] generate_problem: {time.time() - t0:.2f}s")
 
     # --- 2. Generate the reference solution ---

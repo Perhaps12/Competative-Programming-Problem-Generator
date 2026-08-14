@@ -42,6 +42,15 @@ def list_problems(db: Session) -> List[models.Problem]:
     return db.query(models.Problem).order_by(models.Problem.created_at.desc()).all()
 
 
+def get_all_titles(db: Session) -> List[str]:
+    """
+    Return every existing problem title. Used to feed into the problem
+    generation prompt so the AI avoids repeating the same concepts.
+    """
+    rows = db.query(models.Problem.title).all()
+    return [row[0] for row in rows]
+
+
 def delete_problem(db: Session, problem_id: int) -> bool:
     db_problem = get_problem(db, problem_id)
     if not db_problem:

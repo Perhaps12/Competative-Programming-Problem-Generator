@@ -34,12 +34,27 @@ PROBLEM_SCHEMA = {
 }
 
 
-def generate_problem(difficulty: str) -> dict:
+def generate_problem(difficulty: str, existing_titles: list[str] | None = None) -> dict:
     """
     Generate a problem title + statement for the given difficulty.
 
+    existing_titles: titles of problems already in the database. Passed in
+    (rather than queried here) to keep this agent decoupled from the
+    database -- the caller (the route) is responsible for fetching them via
+    crud.get_all_titles() and passing them in.
+
     Returns: {"title": str, "statement": str}
     """
+    avoid_section = ""
+    if existing_titles:
+        titles_list = "\n".join(f"- {t}" for t in existing_titles)
+        avoid_section = f"""
+    The following problems already exist. Do NOT generate a problem that is
+    the same or a close variant of any of these (e.g. don't just rename
+    "Two Sum" to "Pair Sum" -- pick a genuinely different concept/pattern):
+    {titles_list}
+    """
+
     prompt = f"""
     You are generating a LeetCode-style coding problem at "{difficulty}" difficulty.
 
@@ -50,6 +65,7 @@ def generate_problem(difficulty: str) -> dict:
       and any constraints (e.g. array size, value ranges).
 
     Do not include a solution or test cases -- only the problem itself.
+    {avoid_section}
     """
 
     response = client.models.generate_content(
@@ -66,11 +82,11 @@ def generate_problem(difficulty: str) -> dict:
 if __name__ == "__main__":
     # Quick manual test: python -m src.agents.problem
     import time
- 
+
     start = time.time()
     result = generate_problem("easy")
     elapsed = time.time() - start
- 
+
     print(f"Title: {result['title']}\n")
     print(result["statement"])
     print(f"\n[generate_problem took {elapsed:.2f}s]")
