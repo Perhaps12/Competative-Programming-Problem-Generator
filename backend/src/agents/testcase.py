@@ -89,18 +89,30 @@ def generate_testcase_inputs(problem_statement: str, solution_code: str) -> dict
 
 if __name__ == "__main__":
     # Quick manual test: python -m src.agents.testcase
+    import time
     from src.agents.problem import generate_problem
     from src.agents.solution import generate_solution
-
+ 
+    t0 = time.time()
     problem = generate_problem("easy")
+    t1 = time.time()
+ 
     print(f"Title: {problem['title']}\n")
     print(problem["statement"])
-
+    print(f"\n[generate_problem took {t1 - t0:.2f}s]")
+ 
     solution = generate_solution(problem["statement"])
+    t2 = time.time()
+ 
     print(f"\n--- Solution ({solution['language']}) ---\n")
     print(solution["solution_code"])
-
+    print(f"\n[generate_solution took {t2 - t1:.2f}s]")
+ 
     result = generate_testcase_inputs(problem["statement"], solution["solution_code"])
+    t3 = time.time()
+ 
     print(f"\n--- Test case inputs ({len(result['inputs'])}) ---\n")
     for i, test_input in enumerate(result["inputs"], start=1):
         print(f"[{i}] {test_input!r}")
+    print(f"\n[generate_testcase_inputs took {t3 - t2:.2f}s]")
+    print(f"[total: {t3 - t0:.2f}s]")

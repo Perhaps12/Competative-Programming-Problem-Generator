@@ -69,12 +69,21 @@ def generate_solution(problem_statement: str, language: str = "python") -> dict:
 
 if __name__ == "__main__":
     # Quick manual test: python -m src.agents.solution
+    import time
     from src.agents.problem import generate_problem
-
+ 
+    t0 = time.time()
     problem = generate_problem("easy")
+    t1 = time.time()
+ 
     print(f"Title: {problem['title']}\n")
     print(problem["statement"])
-
+    print(f"\n[generate_problem took {t1 - t0:.2f}s]")
+ 
     result = generate_solution(problem["statement"])
+    t2 = time.time()
+ 
     print(f"\n--- Solution ({result['language']}) ---\n")
     print(result["solution_code"])
+    print(f"\n[generate_solution took {t2 - t1:.2f}s]")
+    print(f"[total: {t2 - t0:.2f}s]")

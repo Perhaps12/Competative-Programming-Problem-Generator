@@ -65,6 +65,12 @@ def generate_problem(difficulty: str) -> dict:
 
 if __name__ == "__main__":
     # Quick manual test: python -m src.agents.problem
+    import time
+ 
+    start = time.time()
     result = generate_problem("easy")
+    elapsed = time.time() - start
+ 
     print(f"Title: {result['title']}\n")
     print(result["statement"])
+    print(f"\n[generate_problem took {elapsed:.2f}s]")

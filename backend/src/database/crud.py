@@ -57,3 +57,12 @@ def get_test_cases_for_problem(db: Session, problem_id: int) -> List[models.Test
         .filter(models.TestCase.problem_id == problem_id)
         .all()
     )
+
+
+def add_test_case(db: Session, problem_id: int, input: str, output: str) -> models.TestCase:
+    """Insert a single test case linked to an already-saved problem."""
+    db_test_case = models.TestCase(problem_id=problem_id, input=input, output=output)
+    db.add(db_test_case)
+    db.commit()
+    db.refresh(db_test_case)
+    return db_test_case
