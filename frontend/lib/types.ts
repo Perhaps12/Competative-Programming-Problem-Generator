@@ -40,3 +40,10 @@ export interface SubmissionResult {
   all_passed: boolean;
   results: TestCaseResult[];
 }
+
+export interface ExecuteResult {
+  stdout: string | null;
+  stderr: string | null;
+  exit_code: number | null;
+  output: string | null;
+}

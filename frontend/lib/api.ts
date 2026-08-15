@@ -2,6 +2,7 @@
 // Mirrors backend/src/routes/problems_routes.py.
 
 import type {
+  ExecuteResult,
   Problem,
   ProblemCreateRequest,
   SubmissionRequest,
@@ -36,6 +37,12 @@ export async function createProblem(
   return handleResponse<Problem>(res);
 }
 
+/** Fetch every saved problem. */
+export async function listProblems(): Promise<Problem[]> {
+  const res = await fetch(`${API_URL}/problems/`);
+  return handleResponse<Problem[]>(res);
+}
+
 /** Fetch a single saved problem, including its test cases. */
 export async function getProblem(problemId: number): Promise<Problem> {
   const res = await fetch(`${API_URL}/problems/${problemId}`);
@@ -56,4 +63,24 @@ export async function submitSolution(
     body: JSON.stringify(submission),
   });
   return handleResponse<SubmissionResult>(res);
+}
+
+/**
+ * Run code directly, without checking it against any problem's test cases.
+ * Wraps the standalone /execute route -- useful for a "Run" button that
+ * just shows raw output, separate from "Submit" which grades against a
+ * problem's saved test cases.
+ */
+export async function runCode(
+  language: string,
+  code: string,
+  stdin: string = "",
+  version: string = "*"
+): Promise<ExecuteResult> {
+  const res = await fetch(`${API_URL}/execute/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ language, version, code, stdin }),
+  });
+  return handleResponse<ExecuteResult>(res);
 }

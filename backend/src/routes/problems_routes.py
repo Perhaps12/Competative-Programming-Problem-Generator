@@ -108,6 +108,14 @@ async def create_problem(req: schemas.ProblemCreateRequest, db: Session = Depend
 
 
 # ---------------------------------------------------------------------------
+# LIST — fetch every saved problem
+# ---------------------------------------------------------------------------
+@router.get("/", response_model=list[schemas.ProblemOut])
+def list_problems(db: Session = Depends(get_db)):
+    return crud.list_problems(db)
+
+
+# ---------------------------------------------------------------------------
 # READ — fetch a saved problem
 # ---------------------------------------------------------------------------
 @router.get("/{problem_id}", response_model=schemas.ProblemOut)
