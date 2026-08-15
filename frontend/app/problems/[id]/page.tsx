@@ -9,7 +9,9 @@ import CodeEditor from "@/components/CodeEditor";
 import SubmitButton from "@/components/SubmitButton";
 import SubmissionResults from "@/components/SubmissionResults";
 import RunOutput from "@/components/RunOutput";
+import LanguageSelector from "@/components/LanguageSelector";
 import { getProblem, submitSolution, runCode } from "@/lib/api";
+import { getLanguageOption } from "@/lib/languages";
 import type { ExecuteResult, Problem, SubmissionResult } from "@/lib/types";
 
 const DIFFICULTY_STYLES: Record<Problem["difficulty"], string> = {
@@ -17,8 +19,6 @@ const DIFFICULTY_STYLES: Record<Problem["difficulty"], string> = {
   medium: "bg-amber-500/15 text-amber-400",
   hard: "bg-rose-500/15 text-rose-400",
 };
-
-const DEFAULT_STARTER_CODE = "# Read input, solve, print the result\n";
 
 export default function ProblemPage() {
   const params = useParams<{ id: string }>();
@@ -28,7 +28,9 @@ export default function ProblemPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [code, setCode] = useState(DEFAULT_STARTER_CODE);
+  const [languageId, setLanguageId] = useState("python");
+  const language = getLanguageOption(languageId);
+  const [code, setCode] = useState(language.starterCode);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<SubmissionResult | null>(null);
@@ -45,12 +47,28 @@ export default function ProblemPage() {
       .finally(() => setIsLoading(false));
   }, [problemId]);
 
+  function handleLanguageChange(id: string) {
+    setLanguageId(id);
+    // Swap in that language's starter code. This overwrites whatever the
+    // person had written -- fine for now, but worth revisiting if you want
+    // to preserve code per-language later (e.g. keep a draft per language
+    // in state instead of a single shared `code` string).
+    setCode(getLanguageOption(id).starterCode);
+    setRunResult(null);
+    setSubmitResult(null);
+  }
+
   async function handleRun() {
     setIsRunning(true);
     setError(null);
     setRunResult(null);
     try {
-      const res = await runCode("python", code, stdin, "3.10.0");
+      const res = await runCode(
+        language.pistonLanguage,
+        code,
+        stdin,
+        language.pistonVersion
+      );
       setRunResult(res);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Run failed.");
@@ -65,8 +83,8 @@ export default function ProblemPage() {
     setSubmitResult(null);
     try {
       const res = await submitSolution(problemId, {
-        language: "python",
-        version: "3.10.0",
+        language: language.pistonLanguage,
+        version: language.pistonVersion,
         code,
       });
       setSubmitResult(res);
@@ -125,7 +143,15 @@ export default function ProblemPage() {
 
         {/* Right: editor + run/submit + results */}
         <section className="flex flex-col gap-4">
-          <CodeEditor language="python" value={code} onChange={setCode} />
+          <div className="flex items-center justify-between">
+            <LanguageSelector value={languageId} onChange={handleLanguageChange} />
+          </div>
+
+          <CodeEditor
+            language={language.monacoLanguage}
+            value={code}
+            onChange={setCode}
+          />
 
           <div>
             <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500">

@@ -75,6 +75,7 @@ async def create_problem(req: schemas.ProblemCreateRequest, db: Session = Depend
 
     # --- 5 & 6. Run each input through Piston, save the real output ---
     t4 = time.time()
+    saved_test_cases = []  # track successfully saved ones, for use as examples below
     for i, test_input in enumerate(testcase_data["inputs"], start=1):
         t_case = time.time()
         try:
@@ -94,13 +95,30 @@ async def create_problem(req: schemas.ProblemCreateRequest, db: Session = Depend
             print(f"[create_problem] test case {i} skipped (stderr): {result['stderr']}")
             continue
 
+        output = (result["stdout"] or "").strip()
         crud.add_test_case(
             db=db,
             problem_id=db_problem.id,
             input=test_input,
-            output=(result["stdout"] or "").strip(),
+            output=output,
         )
+        saved_test_cases.append({"input": test_input, "output": output})
     print(f"[create_problem] full piston loop: {time.time() - t4:.2f}s")
+
+    # --- 7. Append 2 verified test cases to the statement as real examples ---
+    # Done here (not by the AI) so the examples shown are guaranteed to
+    # match actual grading -- the AI can't reliably invent correct example
+    # output on its own since it has no way to execute code itself.
+    if saved_test_cases:
+        example_blocks = []
+        for ex in saved_test_cases[:2]:
+            example_blocks.append(
+                f"**Input:**\n```\n{ex['input']}\n```\n\n"
+                f"**Output:**\n```\n{ex['output']}\n```"
+            )
+        examples_markdown = "\n\n## Examples\n\n" + "\n\n".join(example_blocks)
+        db_problem.statement = problem_data["statement"] + examples_markdown
+        db.commit()
 
     db.refresh(db_problem)
     print(f"[create_problem] TOTAL: {time.time() - t0:.2f}s")

@@ -14,6 +14,15 @@ import httpx
 
 PISTON_URL = os.environ.get("PISTON_URL", "http://localhost:2000")
 
+# Piston determines the compiler from the file extension. Java requires
+# the filename to match the public class name (Main.java <-> "public class
+# Main"). C/C++ removed from this project -- see lib/languages.ts on the
+# frontend for why.
+_DEFAULT_FILENAMES = {
+    "python": "main.py",
+    "java": "Main.java",
+}
+
 
 class PistonError(Exception):
     """Raised when Piston can't be reached, or rejects/fails a request."""
@@ -25,18 +34,28 @@ class PistonError(Exception):
 
 
 async def execute_code(
-    language: str, code: str, stdin: str = "", version: str = "*"
+    language: str,
+    code: str,
+    stdin: str = "",
+    version: str = "*",
+    file_name: Optional[str] = None,
 ) -> dict:
     """
     Run code against Piston and return a simplified result dict:
     {"stdout": str, "stderr": str, "exit_code": int, "output": str}
 
+    file_name: explicit filename to send to Piston. If omitted, falls back
+    to _DEFAULT_FILENAMES based on `language` -- this matters most for C++
+    (must end in .cpp, not .c) and Java (must match the public class name).
+
     Raises PistonError if Piston is unreachable or rejects the request.
     """
+    resolved_name = file_name or _DEFAULT_FILENAMES.get(language, "main")
+
     payload = {
         "language": language,
         "version": version,
-        "files": [{"content": code}],
+        "files": [{"name": resolved_name, "content": code}],
         "stdin": stdin or "",
     }
 
@@ -60,3 +79,19 @@ async def execute_code(
         "exit_code": run.get("code"),
         "output": run.get("output"),
     }
+
+
+if __name__ == "__main__":
+    # Quick manual test: python -m src.services.piston
+    import asyncio
+    import json
+
+    result = asyncio.run(
+        execute_code(
+            language="python",
+            version="3.10.0",
+            code="print(input())",
+            stdin="hello world",
+        )
+    )
+    print(json.dumps(result, indent=2))

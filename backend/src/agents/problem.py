@@ -27,7 +27,13 @@ PROBLEM_SCHEMA = {
         "title": {"type": "string"},
         "statement": {
             "type": "string",
-            "description": "Full problem statement in markdown, including examples and constraints.",
+            "description": "Full problem statement in markdown, written in a "
+            "DMOJ/competitive-programming style: separate Description, Input, "
+            "Output, and Constraints sections. All input/output must be "
+            "described purely in terms of stdin/stdout -- no function "
+            "signatures or implied parameters. Do NOT include worked "
+            "examples with invented numbers -- verified examples are "
+            "appended separately after generation.",
         },
     },
     "required": ["title", "statement"],
@@ -56,13 +62,49 @@ def generate_problem(difficulty: str, existing_titles: list[str] | None = None) 
     """
 
     prompt = f"""
-    You are generating a LeetCode-style coding problem at "{difficulty}" difficulty.
+    You are generating an original competitive-programming-style problem at
+    "{difficulty}" difficulty, in the style of DMOJ / Codeforces / AtCoder --
+    NOT in the style of LeetCode.
 
-    Write an original problem (do not copy a well-known existing LeetCode problem
-    verbatim). Include:
-    - A clear title
-    - A markdown-formatted statement with a description, 1-2 examples (input/output),
-      and any constraints (e.g. array size, value ranges).
+    This is critical: submitted solutions are standalone programs that read
+    from stdin and write to stdout. There is NO function signature and NO
+    assumption that variables (arrays, numbers, strings, etc.) are simply
+    "given" as parameters. Every single piece of input the program needs
+    must be explicitly described as something read from stdin, in a
+    precisely specified format.
+
+    The statement (markdown) MUST include, as separate clearly-labeled
+    sections:
+
+    1. **Description** -- what the program needs to compute.
+
+    2. **Input** -- an exact, line-by-line specification of stdin. For
+       example: "The first line contains a single integer n (1 <= n <=
+       1000), the number of elements. The second line contains n
+       space-separated integers a_1, ..., a_n." Do not leave any input
+       format ambiguous or implicit.
+
+    3. **Output** -- an exact specification of what the program must print
+       to stdout, and in what format (e.g. "Print a single integer on one
+       line" or "Print the result array as space-separated integers on one
+       line").
+
+    4. **Constraints** -- bounds on all inputs (sizes, value ranges).
+
+    5. **Examples** section will be appended automatically, do not write one.
+
+    Formatting rule: do NOT use LaTeX or math notation (no $...$, no \\(...\\),
+    no \\frac, \\le, \\times, etc.). This statement is rendered as plain
+    markdown only, with no math-rendering support. Write all math in plain
+    text instead -- e.g. "n^2" instead of LaTeX superscript, "<=" instead of
+    "\\le", "a * b" instead of "\\times", "the sum of squares from 1 to n"
+    written out in words where a formula would otherwise be needed.
+
+    Do NOT include an "Examples" section with invented sample input/output.
+    Do not compute or state any concrete example values yourself -- you are
+    not able to reliably execute code, so any numbers you invent may be
+    wrong. Verified examples (matching an actual working solution) will be
+    appended to this statement separately, after generation.
 
     Do not include a solution or test cases -- only the problem itself.
     {avoid_section}
