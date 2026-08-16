@@ -12,11 +12,16 @@ interface ProblemCardProps {
 }
 
 export default function ProblemCard({ problem }: ProblemCardProps) {
-  // Pull the first line of the statement as a short preview, stripping
-  // markdown heading/emphasis characters for a cleaner snippet.
+  // Pull the first non-heading, non-empty line as a short preview,
+  // stripping markdown emphasis characters for a cleaner snippet. Skips
+  // heading lines (e.g. "## Description") so a stray heading never ends up
+  // as the entire visible preview.
   const preview = problem.statement
     .split("\n")
-    .find((line) => line.trim().length > 0)
+    .find((line) => {
+      const trimmed = line.trim();
+      return trimmed.length > 0 && !trimmed.startsWith("#");
+    })
     ?.replace(/[#*_`]/g, "")
     .slice(0, 120);
 

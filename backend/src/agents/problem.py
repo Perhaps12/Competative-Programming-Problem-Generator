@@ -74,7 +74,7 @@ def generate_problem(difficulty: str, existing_titles: list[str] | None = None) 
     precisely specified format.
 
     The statement (markdown) MUST include, as separate clearly-labeled
-    sections:
+    sections, and displayed appropriately as a header with "## Description", "## Input", "## Output", and "## Constraints".:
 
     1. **Description** -- what the program needs to compute.
 
