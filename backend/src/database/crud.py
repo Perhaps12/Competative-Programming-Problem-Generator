@@ -75,3 +75,18 @@ def add_test_case(db: Session, problem_id: int, input: str, output: str) -> mode
     db.commit()
     db.refresh(db_test_case)
     return db_test_case
+
+
+def get_solution_code(db: Session, problem_id: int) -> Optional[str]:
+    """
+    Return just a problem's solution code, without loading the rest of the
+    problem or its test cases. Used by the on-demand "reveal solution"
+    endpoint, kept separate from get_problem() so the solution isn't
+    fetched as part of the normal page load.
+    """
+    result = (
+        db.query(models.Problem.solution_code)
+        .filter(models.Problem.id == problem_id)
+        .first()
+    )
+    return result[0] if result else None

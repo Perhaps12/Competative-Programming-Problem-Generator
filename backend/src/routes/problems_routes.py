@@ -145,6 +145,17 @@ def get_problem(problem_id: int, db: Session = Depends(get_db)):
 
 
 # ---------------------------------------------------------------------------
+# SOLUTION — fetch just the reference solution, on demand
+# ---------------------------------------------------------------------------
+@router.get("/{problem_id}/solution", response_model=schemas.SolutionResponse)
+def get_solution(problem_id: int, db: Session = Depends(get_db)):
+    solution_code = crud.get_solution_code(db, problem_id)
+    if solution_code is None:
+        raise HTTPException(status_code=404, detail="Problem not found")
+    return schemas.SolutionResponse(solution_code=solution_code)
+
+
+# ---------------------------------------------------------------------------
 # SUBMIT — run submitted code against a problem's test cases via Piston
 # ---------------------------------------------------------------------------
 @router.post("/{problem_id}/submit", response_model=schemas.SubmissionResult)

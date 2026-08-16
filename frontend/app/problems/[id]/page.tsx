@@ -10,6 +10,7 @@ import SubmitButton from "@/components/SubmitButton";
 import SubmissionResults from "@/components/SubmissionResults";
 import RunOutput from "@/components/RunOutput";
 import LanguageSelector from "@/components/LanguageSelector";
+import SolutionReveal from "@/components/SolutionReveal";
 import { getProblem, submitSolution, runCode } from "@/lib/api";
 import { getLanguageOption } from "@/lib/languages";
 import type { ExecuteResult, Problem, SubmissionResult } from "@/lib/types";
@@ -139,6 +140,7 @@ export default function ProblemPage() {
             </span>
           </div>
           <ProblemStatement statement={problem.statement} />
+          <SolutionReveal problemId={problem.id} />
         </section>
 
         {/* Right: editor + run/submit + results */}

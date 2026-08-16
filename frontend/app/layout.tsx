@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Leetcode Clone",
+  title: "Coding Problems",
   description: "AI-generated coding problems with live judging.",
 };
  

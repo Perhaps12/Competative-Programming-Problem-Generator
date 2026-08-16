@@ -5,6 +5,7 @@ import type {
   ExecuteResult,
   Problem,
   ProblemCreateRequest,
+  SolutionResponse,
   SubmissionRequest,
   SubmissionResult,
 } from "./types";
@@ -47,6 +48,16 @@ export async function listProblems(): Promise<Problem[]> {
 export async function getProblem(problemId: number): Promise<Problem> {
   const res = await fetch(`${API_URL}/problems/${problemId}`);
   return handleResponse<Problem>(res);
+}
+
+/**
+ * Fetch just a problem's reference solution, on demand. Kept separate from
+ * getProblem() so the solution isn't loaded until someone actually asks to
+ * see it (e.g. clicking a "reveal solution" dropdown).
+ */
+export async function getSolution(problemId: number): Promise<SolutionResponse> {
+  const res = await fetch(`${API_URL}/problems/${problemId}/solution`);
+  return handleResponse<SolutionResponse>(res);
 }
 
 /**

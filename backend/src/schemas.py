@@ -52,3 +52,7 @@ class SubmissionResult(BaseModel):
     problem_id: int
     all_passed: bool
     results: List[TestCaseResult]
+
+
+class SolutionResponse(BaseModel):
+    solution_code: str

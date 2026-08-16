@@ -47,3 +47,7 @@ export interface ExecuteResult {
   exit_code: number | null;
   output: string | null;
 }
+
+export interface SolutionResponse {
+  solution_code: string;
+}
