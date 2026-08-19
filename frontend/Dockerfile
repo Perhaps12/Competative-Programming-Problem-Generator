@@ -1,6 +1,12 @@
 # Stage 1: install deps and build
 FROM node:24-slim AS builder
 WORKDIR /app
+
+# NEXT_PUBLIC_* vars must be present at BUILD time, not just runtime --
+# Next.js compiles them directly into the JS bundle during `next build`.
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
