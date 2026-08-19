@@ -5,7 +5,7 @@
     "exclude": ["README.md", "cdk*.json", "**/*.d.ts", "**/*.js", "node_modules"]
   },
   "context": {
-    "keyPairName": "leetcode-clone",
+    "keyPairName": "leetcode clone",
     "githubRepoUrl": "https://github.com/Perhaps12/Competative-Programming-Problem-Generator.git"
   }
 }
