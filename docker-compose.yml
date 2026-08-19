@@ -30,6 +30,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       PISTON_URL: http://piston:2000
       API_KEY: ${API_KEY}
+      FRONTEND_URL: https://${DOMAIN}
     depends_on:
       - postgres
       - piston
@@ -51,6 +52,8 @@ services:
     image: caddy:2
     container_name: caddy
     restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
     ports:
       - "80:80"
       - "443:443"
