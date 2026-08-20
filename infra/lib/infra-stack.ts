@@ -67,7 +67,7 @@ export class LeetcodeCloneStack extends cdk.Stack {
     const instance = new ec2.Instance(this, "AppInstance", {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
       machineImage,
       securityGroup,
       keyPair: ec2.KeyPair.fromKeyPairName(this, "KeyPair", props.keyPairName),
