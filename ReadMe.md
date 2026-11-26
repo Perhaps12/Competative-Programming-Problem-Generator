@@ -1,4 +1,4 @@
-**Demo Video:** https://youtu.be/kao_LyX6fkM?si=PDVM6WbH8zl7asa
+**Demo Video:** https://youtu.be/kao_LyX6fkM
 
 # Competitive Programming Problem Generator
 
