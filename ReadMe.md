@@ -1,12 +1,14 @@
+**Demo Video:** https://youtu.be/kao_LyX6fkM?si=PDVM6WbH8zl7asa
+
 # Competitive Programming Problem Generator
 
 An AI-generated coding problem judge with live code execution, built with Next.js, FastAPI, Postgres, and Piston. Supports Python and Java.
 
-## Deployed application
+## Deployment
 
-This project is currently deployed at: https://13-58-28-162.nip.io/
-
-It is hosted on AWS EC2 resources and is served through Dockerized services behind Caddy, with the app stack running in containers on the EC2 instance.
+This project was deployed on AWS EC2 using Docker, with the app stack running
+in containers behind a Caddy reverse proxy (automatic HTTPS). The live instance
+has since been shut down to avoid hosting costs.
 
 ## Project overview
 
